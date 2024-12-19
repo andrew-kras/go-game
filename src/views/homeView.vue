@@ -3,7 +3,7 @@
     .title {{ $t('title') }}
     g-button(
       :text='$t("start")'
-      @click='goToGame'
+      @click='isModalVisible = true'
     )
     .rules
       h3 {{ $t('rules.title') }}
@@ -29,12 +29,36 @@
         li {{ $t('rules.features.strategy') }}
         li {{ $t('rules.features.depth') }}
         li {{ $t('rules.features.accessibility') }}
+  g-modal(
+    v-if='isModalVisible'
+    :visible='isModalVisible'
+    @close='isModalVisible = false'
+    :title='$t("modal.title")'
+  )
+    .actions
+      g-button.size-button(
+        :text='$t("modal.small")'
+        @click='goToGame("small")'
+      )
+      g-button.size-button(
+        :text='$t("modal.medium")'
+        @click='goToGame("medium")'
+      )
+      g-button.size-button(
+        :text='$t("modal.large")'
+        @click='goToGame("large")'
+      )
 </template>
 
 <i18n>
 ru:
   title: Добро пожаловать в игру Го
   start: Начать игру 1 на 1
+  modal:
+    title: Выберите размер поля
+    small: '9×9'
+    medium: '13×13'
+    large: '19×19'
   rules:
     title: "Правила игры Го"
     intro: "Го — это древняя настольная игра, зародившаяся в Китае более 4 тысяч лет назад. Она сочетает в себе простоту правил и невероятную глубину стратегий. Цель игры — захватить территорию на игровом поле, окружив её своими камнями, и не дать сопернику сделать то же самое."
@@ -90,14 +114,27 @@ en:
 
 <script>
 import GButton from '@/components/inputs/GButton.vue'
+import GModal from '@/components/util/GModal.vue'
+
+import {mapStores} from 'pinia'
+import gameStore, {ACTION_SELECT_BOARD_SIZE} from '@/stores/game.js'
 
 export default {
   name: 'homeView',
 
-  components: { GButton },
+  components: {GModal, GButton },
+
+  data: () => ({
+    isModalVisible: false,
+  }),
+
+  computed: {
+    ...mapStores(gameStore)
+  },
 
   methods: {
-    goToGame() {
+    goToGame(size) {
+      this.gameStore[ACTION_SELECT_BOARD_SIZE](size)
       this.$router.push({ name: 'game' })
     }
   }
@@ -121,4 +158,11 @@ export default {
     overflow-y scroll
     text-align justify
     $text-regular()
+
+.actions
+  $flex(dir: column, ai: center)
+  gap 12px
+
+  .size-button
+    width 100px
 </style>
