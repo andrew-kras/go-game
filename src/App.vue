@@ -1,26 +1,26 @@
 <template lang="pug">
   div#app
+    g-header
     router-view
 </template>
 
 <script>
+import GHeader from '@/components/util/GHeader.vue'
+
 export default {
-  name: 'App'
+  name: 'App',
+
+  components: {GHeader}
 }
 </script>
 
 <style lang="stylus">
 @import './styles/globals.styl'
 #app
-  background #f5f5f5
+  background $app-bg
   height 100vh
   width 100vw
-  display flex
-
-#overlay
-  position absolute
-  left 0
-  top 0
-  width 0
-  height 0
+  $flex(dir: column)
 </style>
+
+<style lang="css" src="./styles/scrollbars.css" />

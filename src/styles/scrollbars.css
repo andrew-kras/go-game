@@ -1,0 +1,26 @@
+@supports not selector(::-webkit-scrollbar-thumb) {
+    * {
+        scrollbar-color: #DDA15E #BC6C25;
+    }
+}
+
+@supports selector(::-webkit-scrollbar-thumb) {
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.05);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #DDA15E;
+        border-radius: 3px;
+        outline: none;
+    }
+
+    ::-webkit-scrollbar-corner {
+        background: rgba(0,0,0,0);
+    }
+}

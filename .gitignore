@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 
+static/sprite-desktop.svg
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

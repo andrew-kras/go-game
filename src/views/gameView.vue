@@ -1,7 +1,7 @@
 <template lang="pug">
   .game-view
-    h1 {{ $t('game.title') }}
-    .game-board Placeholder for Game Board
+    .title {{ $t('game.title') }}
+    .game-board
 </template>
 
 <i18n>
@@ -21,14 +21,14 @@ export default {
 
 <style scoped lang="stylus">
 .game-view
-  display flex
-  flex-direction column
-  align-items center
-  justify-content center
-  height 100vh
+  $flex(dir: column)
+  width 100%
+  height 100%
+  padding 40px 24px 0 24px
+  gap 12px
 
-  h1
-    font-size 2rem
+  .title
+    $text-bold()
   .game-board
     width 80%
     height 80%
