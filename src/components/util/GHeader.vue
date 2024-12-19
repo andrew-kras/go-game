@@ -1,6 +1,6 @@
 <template lang="pug">
   header.app-header
-    .title {{$t('title')}}
+    .title(@click='goToHome') {{$t('title')}}
     g-icon-button.icon(
       type='github'
       @click='goGitHub'
@@ -25,6 +25,10 @@ export default {
   methods: {
     goGitHub() {
       window.open('https://github.com/andrew-kras', '_blank')
+    },
+
+    goToHome() {
+      this.$router.push({ name: 'home' })
     }
   }
 }
@@ -41,6 +45,7 @@ export default {
   border-bottom solid 2px $header-border
 
   .title
+    cursor pointer
     margin 0
     $text-bold()
     color $header-text
