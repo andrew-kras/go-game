@@ -89,12 +89,19 @@ export default defineStore('game', {
         [ACTION_CALCULATE_SCORE]() {
             const territory = { black: 0, white: 0 }
             const size = this.board.length
+            const visited = new Set()
 
             for (let row = 0; row < size; row++) {
                 for (let col = 0; col < size; col++) {
-                    if (!this.board[row][col].value) {
-                        const surroundedBy = this.getSurroundingPlayer(row, col)
-                        if (surroundedBy) territory[surroundedBy]++
+                    if (!this.board[row][col].value && !visited.has(`${row}-${col}`)) {
+                        const group = this.findTerritory(row, col, visited)
+                        const surroundedBy = this.getSurroundingPlayer(row, col, group)
+
+                        if (surroundedBy) {
+                            group.forEach(({ row, col }) => {
+                                territory[surroundedBy]++
+                            })
+                        }
                     }
                 }
             }
@@ -102,6 +109,72 @@ export default defineStore('game', {
             this.score.black += territory.black
             this.score.white += territory.white + this.komi
             alert(`Game Over! Black: ${this.score.black}, White: ${this.score.white}`)
+        },
+
+        findTerritory(row, col, visited) {
+            const stack = [{ row, col }]
+            const group = []
+            const size = this.board.length
+
+            while (stack.length > 0) {
+                const { row, col } = stack.pop()
+                const key = `${row}-${col}`
+
+                if (visited.has(key)) continue
+                visited.add(key)
+                group.push({ row, col })
+
+                const directions = [
+                    [-1, 0], [1, 0], [0, -1], [0, 1]
+                ]
+
+                for (const [dx, dy] of directions) {
+                    const neighborRow = row + dx
+                    const neighborCol = col + dy
+
+                    if (
+                        neighborRow >= 0 && neighborRow < size &&
+                        neighborCol >= 0 && neighborCol < size &&
+                        !this.board[neighborRow][neighborCol].value &&
+                        !visited.has(`${neighborRow}-${neighborCol}`)
+                    ) {
+                        stack.push({ row: neighborRow, col: neighborCol })
+                    }
+                }
+            }
+
+            return group
+        },
+
+        getSurroundingPlayer(row, col, group) {
+            const directions = [
+                [-1, 0], [1, 0], [0, -1], [0, 1]
+            ]
+            let surroundingPlayer = null
+
+            for (const { row, col } of group) {
+                for (const [dx, dy] of directions) {
+                    const neighborRow = row + dx
+                    const neighborCol = col + dy
+
+                    if (
+                        neighborRow >= 0 && neighborRow < this.board.length &&
+                        neighborCol >= 0 && neighborCol < this.board.length
+                    ) {
+                        const neighbor = this.board[neighborRow][neighborCol]
+
+                        if (neighbor.value) {
+                            if (!surroundingPlayer) {
+                                surroundingPlayer = neighbor.value
+                            } else if (surroundingPlayer !== neighbor.value) {
+                                return null
+                            }
+                        }
+                    }
+                }
+            }
+
+            return surroundingPlayer
         },
 
         checkCaptures(row, col) {
@@ -165,36 +238,6 @@ export default defineStore('game', {
                 this.score[this.currentPlayer]++
                 this.forbiddenCells.push(`${row}-${col}`)
             })
-        },
-
-        getSurroundingPlayer(row, col, visited = new Set()) {
-            const key = `${row}-${col}`
-            if (visited.has(key)) return null
-            visited.add(key)
-
-            const directions = [
-                [-1, 0], [1, 0], [0, -1], [0, 1]
-            ]
-
-            let surroundingPlayer = null
-
-            for (const [dx, dy] of directions) {
-                const neighborRow = row + dx
-                const neighborCol = col + dy
-
-                if (
-                    neighborRow < 0 || neighborRow >= this.board.length ||
-                    neighborCol < 0 || neighborCol >= this.board.length
-                ) continue
-
-                const neighbor = this.board[neighborRow][neighborCol]
-
-                if (!neighbor.value) return null
-                if (!surroundingPlayer) surroundingPlayer = neighbor.value
-                if (surroundingPlayer !== neighbor.value) return null
-            }
-
-            return surroundingPlayer
         },
 
         updateForbiddenCells() {
