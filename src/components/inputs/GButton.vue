@@ -71,6 +71,11 @@ button
     border 2px solid $btn-border-active
     transform translateY(2px)
 
+  &:disabled
+    background-color $btn-bg-disabled
+    border 2px solid $btn-border-disabled
+    transform translateY(0)
+
   &.medium
     padding 0 42px
     height 48px

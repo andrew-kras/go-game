@@ -1,7 +1,7 @@
 <template lang="pug">
   .g-modal-overlay(
     v-if='visible'
-    @click='closeOnOverlay'
+    @click.self='closeOnOverlay'
   )
     .g-modal
       .g-modal-header

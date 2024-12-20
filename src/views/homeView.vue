@@ -38,10 +38,12 @@
     .actions
       g-button.size-button(
         :text='$t("modal.small")'
+        disabled
         @click='goToGame("small")'
       )
       g-button.size-button(
         :text='$t("modal.medium")'
+        disabled
         @click='goToGame("medium")'
       )
       g-button.size-button(
