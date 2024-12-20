@@ -1,10 +1,6 @@
 <template lang="pug">
   .game-view
     .title {{ $t('title') }}
-    g-button(
-      :text='$t("reset")'
-      @click='resetGame'
-    )
     .game-board(:style='{ gridTemplateColumns: `repeat(${boardSize}, 1fr)` }')
       div.game-cell(
         v-for='cell in flatBoard'
@@ -12,15 +8,32 @@
         :class='{"black-stone": cell.value === "black", "white-stone": cell.value === "white"}'
         @click='makeMove(cell.id)'
       )
+    .buttons
+      g-button(
+        :text='$t("reset")'
+        @click='resetGame'
+      )
+      g-button(
+        :text='$t("undo")'
+        @click='undoMove'
+      )
+      g-button(
+        :text='$t("pass")'
+        @click='passTurn'
+      )
 </template>
 
 <i18n>
 ru:
   title: Игровое поле
   reset: Сбросить игру
+  undo: Отменить ход
+  pass: Пропустить ход
 en:
   title: Game Board
   reset: Reset Game
+  undo: Undo Move
+  pass: Pass Turn
 </i18n>
 
 <script>
@@ -29,8 +42,11 @@ import gameStore, {
   GETTER_BOARD,
   GETTER_CURRENT_PLAYER,
   ACTION_MAKE_MOVE,
-  ACTION_RESET_GAME
+  ACTION_RESET_GAME,
+  ACTION_UNDO_MOVE,
+  ACTION_PASS_TURN
 } from '@/stores/game.js'
+
 import GButton from '@/components/inputs/GButton.vue'
 
 export default {
@@ -65,6 +81,14 @@ export default {
 
     resetGame() {
       this.gameStore[ACTION_RESET_GAME]()
+    },
+
+    undoMove() {
+      this.gameStore[ACTION_UNDO_MOVE]()
+    },
+
+    passTurn() {
+      this.gameStore[ACTION_PASS_TURN]()
     }
   },
 
@@ -85,6 +109,10 @@ export default {
   .title
     $text-bold()
 
+  .buttons
+    $flex(ai: center, jc: center)
+    gap 12px
+
 .game-board
   display grid
   gap 1px
@@ -99,16 +127,15 @@ export default {
 
 .game-cell
   background-color $color4
-  border 1px solid $color5
   $flex(ai: center, jc: center)
 
 .black-stone
   background-color $black
   border-radius 50%
-  $square(50%)
+  $square(100%)
 
 .white-stone
   background-color $white
   border-radius 50%
-  $square(50%)
+  $square(100%)
 </style>
