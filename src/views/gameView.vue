@@ -123,9 +123,12 @@ export default {
   .game
     width 475px
     height 475px
+    background-color $color4
+    outline 5px solid $color4
+    border-radius 8px
 
     .game-back-broad
-      transform translate(15px, 15px)
+      transform translate(12.5px, 12.5px)
 
       display grid
       background-color $color4
