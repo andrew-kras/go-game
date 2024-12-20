@@ -19,7 +19,9 @@ export default defineStore('game', {
         currentPlayer: 'black',
         history: [],
         score: { black: 0, white: 0 },
-        passes: 0
+        passes: 0,
+        forbiddenCells: [],
+        komi: 6.5
     }),
 
     getters: {
@@ -32,6 +34,11 @@ export default defineStore('game', {
     actions: {
         async [ACTION_SELECT_BOARD_SIZE](value) {
             this.size = value
+            if (this.size === 'small' || this.size === 'medium') {
+                this.komi = 4.5
+            } else if (this.size === 'large') {
+                this.komi = 6.5
+            }
         },
 
         [ACTION_RESET_GAME]() {
@@ -43,14 +50,20 @@ export default defineStore('game', {
             this.history = []
             this.score = { black: 0, white: 0 }
             this.passes = 0
+            this.forbiddenCells = []
         },
 
         [ACTION_MAKE_MOVE](cellId) {
+            if (this.forbiddenCells.includes(cellId)) return
+
             const [row, col] = cellId.split('-').map(Number)
             if (!this.board[row][col].value) {
                 this.history.push(JSON.parse(JSON.stringify(this.board)))
                 this.board[row][col].value = this.currentPlayer
                 this.checkCaptures(row, col)
+
+                this.updateForbiddenCells()
+
                 this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black'
                 this.passes = 0
             }
@@ -61,6 +74,7 @@ export default defineStore('game', {
                 this.board = this.history.pop()
                 this.currentPlayer = this.currentPlayer === 'black' ? 'white' : 'black'
                 this.passes = 0
+                this.updateForbiddenCells()
             }
         },
 
@@ -86,7 +100,7 @@ export default defineStore('game', {
             }
 
             this.score.black += territory.black
-            this.score.white += territory.white
+            this.score.white += territory.white + this.komi
             alert(`Game Over! Black: ${this.score.black}, White: ${this.score.white}`)
         },
 
@@ -149,6 +163,7 @@ export default defineStore('game', {
             stones.forEach(({ row, col }) => {
                 this.board[row][col].value = null
                 this.score[this.currentPlayer]++
+                this.forbiddenCells.push(`${row}-${col}`)
             })
         },
 
@@ -180,6 +195,13 @@ export default defineStore('game', {
             }
 
             return surroundingPlayer
+        },
+
+        updateForbiddenCells() {
+            this.forbiddenCells = this.forbiddenCells.filter(cellId => {
+                const [row, col] = cellId.split('-').map(Number)
+                return this.board[row][col].value === null
+            })
         }
     }
 })
