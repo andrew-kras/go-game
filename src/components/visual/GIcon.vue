@@ -23,7 +23,7 @@ export default {
 
   computed: {
     sprite() {
-      return `/static/sprite-desktop.svg#${this.name}`
+      return `/public/icons/sprite-desktop.svg#${this.name}`
     }
   }
 }
